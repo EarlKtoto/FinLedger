@@ -1,0 +1,13 @@
+@host = http://localhost:5101
+
+GET {{host}}/health
+
+###
+
+POST {{host}}/api/identity/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@finledger.local",
+  "password": "ChangeMe!12345"
+}
