@@ -1,0 +1,31 @@
+@host = http://localhost:5028
+
+GET {{host}}/health
+
+###
+
+POST {{host}}/api/bank-connections
+Content-Type: application/json
+
+{
+  "participantId": "00000000-0000-0000-0000-000000000001",
+  "bankCode": "SAMPLEBANK",
+  "displayName": "Sample Bank",
+  "baseUrl": "http://localhost:5024",
+  "apiKey": "sample-bank-key"
+}
+
+###
+
+POST {{host}}/api/bank-validation/payer
+Content-Type: application/json
+
+{
+  "payerParticipantId": "00000000-0000-0000-0000-000000000001",
+  "payerAccountId": "00000000-0000-0000-0000-000000000101",
+  "payerBankCode": "SAMPLEBANK",
+  "payerAccountNumber": "100-200",
+  "amount": 25,
+  "currencyCode": "USD",
+  "externalReference": "payment-001"
+}

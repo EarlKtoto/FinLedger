@@ -16,33 +16,51 @@ public sealed class HttpBankIntegrationClient : IBankIntegrationClient
 
     public Task<ExternalOperationResult> ValidatePayerAsync(Transaction transaction, CancellationToken cancellationToken = default)
     {
-        return ValidateAsync(new BankVerificationRequestDto(transaction.PayerBankCode, transaction.PayerAccountNumber), "Payer", cancellationToken);
+        var request = new ValidatePayerBankRequest(
+            transaction.PayerParticipantId,
+            transaction.PayerAccountId,
+            transaction.PayerBankCode,
+            transaction.PayerAccountNumber,
+            transaction.Amount,
+            transaction.CurrencyCode,
+            transaction.ExternalReference);
+
+        return ValidateAsync("/api/bank-validation/payer", request, "Payer", cancellationToken);
     }
 
     public Task<ExternalOperationResult> ValidateReceiverAsync(Transaction transaction, CancellationToken cancellationToken = default)
     {
-        return ValidateAsync(new BankVerificationRequestDto(transaction.ReceiverBankCode, transaction.ReceiverAccountNumber), "Receiver", cancellationToken);
+        var request = new ValidateReceiverBankRequest(
+            transaction.ReceiverParticipantId,
+            transaction.ReceiverAccountId,
+            transaction.ReceiverBankCode,
+            transaction.ReceiverAccountNumber,
+            transaction.Amount,
+            transaction.CurrencyCode,
+            transaction.ExternalReference);
+
+        return ValidateAsync("/api/bank-validation/receiver", request, "Receiver", cancellationToken);
     }
 
-    private async Task<ExternalOperationResult> ValidateAsync(BankVerificationRequestDto request, string side, CancellationToken cancellationToken)
+    private async Task<ExternalOperationResult> ValidateAsync<TRequest>(string path, TRequest request, string side, CancellationToken cancellationToken)
     {
         try
         {
-            var response = await _httpClient.PostAsJsonAsync("/api/banks/verify", request, cancellationToken);
+            var response = await _httpClient.PostAsJsonAsync(path, request, cancellationToken);
             if (!response.IsSuccessStatusCode)
             {
                 return ExternalOperationResult.Failure($"{side} validation failed with HTTP {(int)response.StatusCode}.");
             }
 
-            var result = await response.Content.ReadFromJsonAsync<BankVerificationResultDto>(cancellationToken);
+            var result = await response.Content.ReadFromJsonAsync<BankValidationResponse>(cancellationToken);
             if (result is null)
             {
                 return ExternalOperationResult.Failure($"{side} validation returned an empty response.");
             }
 
-            return result.IsAvailable
+            return result.IsValid
                 ? ExternalOperationResult.Success(result.Message)
-                : ExternalOperationResult.Failure(result.Message);
+                : ExternalOperationResult.Failure($"{result.ErrorCode}: {result.Message}");
         }
         catch (HttpRequestException exception)
         {
