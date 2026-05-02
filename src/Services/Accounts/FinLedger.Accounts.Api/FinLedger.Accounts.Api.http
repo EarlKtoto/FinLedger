@@ -1,0 +1,24 @@
+@host = http://localhost:5129
+@token = paste-jwt-here
+
+GET {{host}}/health
+
+###
+
+GET {{host}}/api/accounts
+Authorization: Bearer {{token}}
+
+###
+
+POST {{host}}/api/accounts
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "participantId": "00000000-0000-0000-0000-000000000001",
+  "type": "BankSettlement",
+  "currencyCode": "USD",
+  "displayName": "Default bank settlement",
+  "allowIncomingPayments": true,
+  "allowOutgoingPayments": true
+}

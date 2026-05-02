@@ -1,0 +1,55 @@
+@host = http://localhost:5077
+@token = paste-jwt-here
+
+GET {{host}}/health
+
+###
+
+POST {{host}}/api/ledger/accounts
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "accountId": "00000000-0000-0000-0000-000000000101",
+  "participantId": "00000000-0000-0000-0000-000000000001",
+  "accountNumber": "FL-0000000001",
+  "currencyCode": "USD",
+  "initialAvailableBalance": 1000
+}
+
+###
+
+GET {{host}}/api/ledger/accounts/00000000-0000-0000-0000-000000000101/balance
+Authorization: Bearer {{token}}
+
+###
+
+POST {{host}}/api/ledger/reservations
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "accountId": "00000000-0000-0000-0000-000000000101",
+  "externalTransactionId": "payment-001",
+  "idempotencyKey": "reserve-payment-001",
+  "amount": 50,
+  "currencyCode": "USD",
+  "expiresAtUtc": null,
+  "description": "Reserve payment funds"
+}
+
+###
+
+POST {{host}}/api/ledger/transfers
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "debitAccountId": "00000000-0000-0000-0000-000000000101",
+  "creditAccountId": "00000000-0000-0000-0000-000000000102",
+  "externalTransactionId": "payment-002",
+  "idempotencyKey": "transfer-payment-002",
+  "amount": 25,
+  "currencyCode": "USD",
+  "description": "Internal ledger transfer"
+}
