@@ -1,0 +1,30 @@
+@host = http://localhost:5036
+@token = paste-jwt-here
+
+GET {{host}}/health
+
+###
+
+POST {{host}}/api/transactions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "payerParticipantId": "00000000-0000-0000-0000-000000000001",
+  "receiverParticipantId": "00000000-0000-0000-0000-000000000002",
+  "payerAccountId": "00000000-0000-0000-0000-000000000101",
+  "receiverAccountId": "00000000-0000-0000-0000-000000000102",
+  "payerBankCode": "PAYERBANK",
+  "payerAccountNumber": "PAYER-001",
+  "receiverBankCode": "RECEIVERBANK",
+  "receiverAccountNumber": "RECEIVER-001",
+  "amount": 25,
+  "currencyCode": "USD",
+  "description": "Sample payment",
+  "externalReference": "payment-001"
+}
+
+###
+
+GET {{host}}/api/transactions
+Authorization: Bearer {{token}}
