@@ -1,0 +1,29 @@
+@host = http://localhost:5282
+@apiKey = test-bank-api-key
+@correlationId = 11111111111111111111111111111111
+
+###
+GET {{host}}/health
+X-API-KEY: {{apiKey}}
+X-Correlation-ID: {{correlationId}}
+
+###
+POST {{host}}/api/payments
+Content-Type: application/json
+X-API-KEY: {{apiKey}}
+X-Correlation-ID: {{correlationId}}
+
+{
+  "payerParticipantId": "00000000-0000-0000-0000-000000000001",
+  "payerAccountId": "00000000-0000-0000-0000-000000000101",
+  "payerBankCode": "TESTBANK",
+  "payerAccountNumber": "PAY-001",
+  "receiverParticipantId": "00000000-0000-0000-0000-000000000002",
+  "receiverAccountId": "00000000-0000-0000-0000-000000000202",
+  "receiverBankCode": "TESTBANK",
+  "receiverAccountNumber": "REC-001",
+  "amount": 100.00,
+  "currency": "USD",
+  "description": "Gateway smoke payment",
+  "externalReference": "GW-001"
+}
